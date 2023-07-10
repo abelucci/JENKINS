@@ -1,5 +1,11 @@
 FROM php:8.0.0-apache
 ARG DEBIAN_FRONTEND=noninteractive
+## Cliente docker
+RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
+  && tar xzvf docker-17.04.0-ce.tgz \
+  && mv docker/docker /usr/local/bin \
+  && rm -r docker docker-17.04.0-ce.tgz
+###
 RUN docker-php-ext-install mysqli
 # Include alternative DB driver
 # RUN docker-php-ext-install pdo
