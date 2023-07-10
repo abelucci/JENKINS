@@ -1,25 +1,20 @@
-FROM php:8.0.0-apache
-ARG DEBIAN_FRONTEND=noninteractive
-## Cliente docker
-RUN curl -fsSLO https://get.docker.com/builds/Linux/x86_64/docker-17.04.0-ce.tgz \
-  && tar xzvf docker-17.04.0-ce.tgz \
-  && mv docker/docker /usr/local/bin \
-  && rm -r docker docker-17.04.0-ce.tgz
-###
-RUN docker-php-ext-install mysqli
-# Include alternative DB driver
-# RUN docker-php-ext-install pdo
-# RUN docker-php-ext-install pdo_mysql
-RUN apt-get update \
-    && apt-get install -y sendmail libpng-dev \
-    && apt-get install -y libzip-dev \
-    && apt-get install -y zlib1g-dev \
-    && apt-get install -y libonig-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && docker-php-ext-install zip
+# Partimos de una base oficial de python
+FROM python:2.7-slim
 
-RUN docker-php-ext-install mbstring
-RUN docker-php-ext-install zip
-RUN docker-php-ext-install gd
+# El directorio de trabajo es desde donde se ejecuta el contenedor al iniciarse
+WORKDIR /app
 
-RUN a2enmod rewrite
+# Copiamos todos los archivos del build context al directorio /app del contenedor
+COPY . /app
+
+# Ejecutamos pip para instalar las dependencias en el contenedor
+RUN pip install --trusted-host pypi.python.org -r requirements.txt
+
+# Indicamos que este contenedor se comunica por el puerto 80/tcp
+EXPOSE 80
+
+# Declaramos una variable de entorno
+ENV NAME World
+
+# Ejecuta nuestra aplicación cuando se inicia el contenedor
+CMD ["python", "app.py"]
